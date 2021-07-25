@@ -4,7 +4,7 @@ import interfaces.MyList;
 
 import java.util.Arrays;
 
-public class MyArrayList<T> implements MyList {
+public class MyArrayList<T> implements MyList<T> {
 
     private T[] elementData;
     private int size = 0;
@@ -21,9 +21,9 @@ public class MyArrayList<T> implements MyList {
     }
 
     @Override
-    public void add(Object value) {
+    public void add(T value) {
         ensureCapacity();
-        elementData[size++] = (T) value;
+        elementData[size++] = value;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MyArrayList<T> implements MyList {
 
     @Override
     public void clear() {
-        Arrays.fill(elementData, null);
+       Arrays.fill(elementData, null);
         this.size = 0;
     }
 

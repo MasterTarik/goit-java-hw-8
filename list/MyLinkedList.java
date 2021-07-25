@@ -1,10 +1,11 @@
 package list;
 
+import interfaces.DescendingIterator;
 import interfaces.MyList;
 
 import java.util.Iterator;
 
-public class MyLinkedList<T> implements MyList {
+public class MyLinkedList<T> implements MyList<T>, Iterator<T>, DescendingIterator<T> {
 
     private Node<T> firstElement;
     private Node<T> lastElement;
@@ -16,9 +17,9 @@ public class MyLinkedList<T> implements MyList {
     }
 
     @Override
-    public void add(Object value) {
-        Node<T> tempElement = lastElement;
-        lastElement.setCurrentElement((T) value);
+    public void add(T value) {
+        final Node<T> tempElement = lastElement;
+        lastElement.setCurrentElement(value);
         lastElement = new Node<>(tempElement, null, null);
         tempElement.setNextElement(lastElement);
         tempElement.setPrevElement(firstElement);
@@ -33,25 +34,68 @@ public class MyLinkedList<T> implements MyList {
 
     @Override
     public void clear() {
-
+        new MyLinkedList<T>();
+        this.size = 0;
     }
 
     @Override
     public void remove(int index) {
-        Node<T> prevRemoveElement = firstElement.getNextElement();
-        for (int i = 0; i < index; i++) {
-            prevRemoveElement = prevRemoveElement.getNextElement();
+        Node<T> prevRemoveElement;
+        Node<T> afterRemoveElement = firstElement.getNextElement();
+        for (int i = 0; i < index + 2; i++) {
+            if (i == (index - 1)) {
+                prevRemoveElement = afterRemoveElement;
+            }
+            afterRemoveElement = afterRemoveElement.getNextElement();
         }
 
     }
 
     @Override
-    public Object get(int index) throws IndexOutOfBoundsException {
+    public T get(int index) throws IndexOutOfBoundsException {
         Node<T> target = firstElement.getNextElement();
         for (int i = 0; i < index; i++) {
             target = target.getNextElement();
         }
         return target.getCurrentElement();
+    }
+
+    @Override
+    public String toString() {
+        String str = "[";
+        Node<T> bufferNode = firstElement.getNextElement();
+        for (int i = 0; i < size; i++) {
+            str = str.concat(String.valueOf(bufferNode.getCurrentElement())).concat(" ");
+            bufferNode = bufferNode.getNextElement();
+        }
+        return str.strip().concat("]");
+    }
+
+    @Override
+    public boolean hasNext() {
+        return false;
+    }
+
+    @Override
+    public T next() {
+        return null;
+    }
+
+    @Override
+    public Iterator<T> descendingIterator() {
+        return new Iterator<>() {
+            int count = 0;
+
+            @Override
+            public boolean hasNext() {
+                return count < size;
+            }
+
+            @Override
+            public T next() {
+                return get(count++);
+            }
+        };
     }
 
     private class Node<T> {

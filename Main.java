@@ -18,13 +18,26 @@ public class Main {
         System.out.printf("myList %s%n", myList.toString());
         System.out.printf("size %d%n", myList.size());
         System.out.printf("tValueOf = %s%n", myList.toString());
+        myList.clear();
+        System.out.printf("myList after clear %s%n", myList.toString());
+
 
         MyList<Character> myLinkedList = new MyLinkedList<>();
         myLinkedList.add('t');
-        System.out.printf("myLinkedList: %s%n", myLinkedList.toString());
+        System.out.printf("myLinkedList: %s%n", myLinkedList);
         System.out.printf("get = %s%n", myLinkedList.get(0));
-        System.out.printf("get = %s%n", myLinkedList.get(3));
+
         myLinkedList.add('a');
+        System.out.printf("myLinkedList: %s%n", myLinkedList.toString());
+
+        myLinkedList.add('r');
+        System.out.printf("myLinkedList: %s%n", myLinkedList.toString());
+
+        myLinkedList.remove(1);
+        System.out.printf("myLinkedList after remote el. with index 1: %s%n", myLinkedList.toString());
+
+        myLinkedList.clear();
+        System.out.printf("myLinkedList after clean: %s%n", myLinkedList.toString());
 
     }
 }
