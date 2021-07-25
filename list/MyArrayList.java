@@ -1,6 +1,8 @@
 package list;
 
-import interfacec.MyList;
+import interfaces.MyList;
+
+import java.util.Arrays;
 
 public class MyArrayList<T> implements MyList {
 
@@ -24,7 +26,6 @@ public class MyArrayList<T> implements MyList {
         elementData[size++] = (T) value;
     }
 
-
     @Override
     public void remove(int index) {
         System.arraycopy(elementData, index + 1, elementData, index, elementData.length - (index + 1));
@@ -33,9 +34,8 @@ public class MyArrayList<T> implements MyList {
 
     @Override
     public void clear() {
-        this.capacity = 10;
+        Arrays.fill(elementData, null);
         this.size = 0;
-        this.elementData = (T[]) new Object[capacity];
     }
 
     @Override
@@ -48,7 +48,8 @@ public class MyArrayList<T> implements MyList {
         return elementData[index];
     }
 
-    public String getList() {
+    @Override
+    public String toString() {
         String str = "[";
         for (Object s : elementData) {
             if (s == null) {
@@ -56,15 +57,18 @@ public class MyArrayList<T> implements MyList {
             }
             str = str + String.valueOf(s) + " ";
         }
-
         return str.strip().concat("]");
     }
 
     private void ensureCapacity() {
-        if (size + 1 > this.capacity) {
-            this.capacity = (this.capacity * 3) / 2 + 1;
-            T[] bufCapacity = (T[]) new Object[capacity];
-            System.arraycopy(elementData, 0, this.elementData = (T[]) new Object[this.capacity], 0, this.size);
+        try {
+            if (size + 1 > this.capacity) {
+                this.capacity = (this.capacity * 3) / 2 + 1;
+                T[] bufCapacity = (T[]) new Object[capacity];
+                System.arraycopy(elementData, 0, this.elementData = (T[]) new Object[this.capacity], 0, this.size);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 }
