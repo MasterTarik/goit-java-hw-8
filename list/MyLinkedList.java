@@ -2,29 +2,57 @@ package list;
 
 import interfaces.DescendingIterator;
 import interfaces.MyList;
-
 import java.util.Iterator;
+import java.util.Objects;
 
-public class MyLinkedList<T> implements MyList<T>, Iterator<T>, DescendingIterator<T> {
+public class MyLinkedList<T> implements MyList<T>, Iterable<T>, DescendingIterator<T> {
 
     private Node<T> firstElement;
     private Node<T> lastElement;
     private int size = 0;
 
     public MyLinkedList() {
-        this.lastElement = new Node<>(firstElement, null, null);
-        this.firstElement = new Node<>(null, null, lastElement);
+        this.firstElement = null;
+        this.lastElement = null;
     }
 
     @Override
     public void add(T value) {
-        final Node<T> tempElement = lastElement;
-        lastElement.setCurrentElement(value);
-        lastElement = new Node<>(tempElement, null, null);
-        tempElement.setNextElement(lastElement);
-        tempElement.setPrevElement(firstElement);
+        Node<T> addElement = new Node<>(value);
+        if (firstElement == null) {
+            firstElement = lastElement = addElement;
+        } else {
+            lastElement.setNextElement(addElement);
+            lastElement = addElement;
+        }
         size++;
-        System.out.printf("tempElement: %s%n", lastElement);
+    }
+
+    public void addIndex(int index, T value) {
+        Objects.checkIndex(index, size + 1);
+        Node<T> addElem = new Node<>(value);
+        if (firstElement == null) {
+            firstElement = lastElement = addElem;
+        } else if (size == 0) {
+            addElem.setNextElement(firstElement);
+            firstElement = addElem;
+        } else if (index == size) {
+            lastElement.setNextElement(addElem);
+            lastElement = addElem;
+        } else {
+            Node<T> currentElem = getNode(index);
+            addElem.setNextElement(currentElem.getNextElement());
+            currentElem.setNextElement(addElem);
+        }
+        size++;
+    }
+
+    private Node<T> getNode(int index) {
+        Node<T> currentElem = firstElement;
+        for (int i = 0; i < index; i++) {
+            currentElem = currentElem.getNextElement();
+        }
+        return currentElem;
     }
 
     @Override
@@ -40,71 +68,82 @@ public class MyLinkedList<T> implements MyList<T>, Iterator<T>, DescendingIterat
 
     @Override
     public void remove(int index) {
-        Node<T> prevRemoveElement;
-        Node<T> afterRemoveElement = firstElement.getNextElement();
-        for (int i = 0; i < index + 2; i++) {
-            if (i == (index - 1)) {
-                prevRemoveElement = afterRemoveElement;
+        Objects.checkIndex(index, size);
+        if (index == 0) {
+            firstElement = firstElement.getNextElement();
+            if (firstElement == null) {
+                lastElement = null;
             }
-            afterRemoveElement = afterRemoveElement.getNextElement();
+        } else {
+            Node<T> prev = getNode(index - 1);
+            prev.setNextElement(prev.getNextElement().getNextElement());
+            if (index == size - 1) {
+                lastElement = prev;
+            }
         }
-
+        size--;
     }
 
     @Override
     public T get(int index) throws IndexOutOfBoundsException {
-        Node<T> target = firstElement.getNextElement();
-        for (int i = 0; i < index; i++) {
-            target = target.getNextElement();
-        }
-        return target.getCurrentElement();
+        return getNode(index).getCurrentElement();
     }
 
     @Override
     public String toString() {
         String str = "[";
-        Node<T> bufferNode = firstElement.getNextElement();
+        Node<T> bufferNode = firstElement;
         for (int i = 0; i < size; i++) {
-            str = str.concat(String.valueOf(bufferNode.getCurrentElement())).concat(" ");
+            str = str + String.valueOf(bufferNode.getCurrentElement()) + " ";
             bufferNode = bufferNode.getNextElement();
         }
         return str.strip().concat("]");
     }
 
     @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public T next() {
-        return null;
-    }
-
-    @Override
-    public Iterator<T> descendingIterator() {
-        return new Iterator<>() {
-            int count = 0;
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            int counter = 0;
 
             @Override
             public boolean hasNext() {
-                return count < size;
+                return counter < size;
             }
 
             @Override
             public T next() {
-                return get(count++);
+                return get(counter++);
             }
         };
     }
 
-    private class Node<T> {
+    @Override
+    public Iterator<T> descendingIterator() {
+        return new Iterator<T>() {
+            int counter = size - 1;
+
+            @Override
+            public boolean hasNext() {
+                return counter > 0;
+            }
+
+            @Override
+            public T next() {
+                return get(counter--);
+            }
+        };
+    }
+
+
+    private static class Node<T> {
         private T currentElement;
         private Node<T> nextElement;
-        private Node<T> prevElement;
 
-        private Node(Node<T> prevElement, T currentElement, Node<T> nextElement) {
-            this.prevElement = prevElement;
+        Node(T element) {
+            this.currentElement = element;
+        }
+
+        Node(T currentElement, Node<T> nextElement) {
             this.currentElement = currentElement;
             this.nextElement = nextElement;
         }
@@ -123,14 +162,6 @@ public class MyLinkedList<T> implements MyList<T>, Iterator<T>, DescendingIterat
 
         public void setNextElement(Node<T> nextElement) {
             this.nextElement = nextElement;
-        }
-
-        public Node<T> getPrevElement() {
-            return prevElement;
-        }
-
-        public void setPrevElement(Node<T> lastElement) {
-            this.prevElement = lastElement;
         }
     }
 
